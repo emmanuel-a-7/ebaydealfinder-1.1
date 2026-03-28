@@ -1,0 +1,10 @@
+{
+  "webhookUrl": "https://discord.com/api/webhooks/1483987361594347733/XtWq8jDLsl_mgijpno0hdFkA_9juVHt926RN4tVxmVuwmtgUDC_wazrhHv7MDZ8OTygt",
+  "intervalMinutes": 10,
+  "maxPrice": 400,
+  "query": "playstation 5",
+  "projectName": "PS5 Deal Finder",
+  "requiredKeywords": "ps5, playstation",
+  "exclusionKeywords": "broken, parts, box",
+  "port": 3060
+}
