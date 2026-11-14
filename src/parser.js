@@ -1,9 +1,6 @@
-// ============================================================
-// src/parser.js — eBay Listing Filter
-// Filters raw listings extracted by the scraper from the live DOM
-// ============================================================
+// Listing parser
 
-// Keywords in condition/subtitle that mean "for parts / not working"
+// Excluded conditions
 const EXCLUDED_CONDITIONS = [
     'for parts or not working',
     'for parts',
@@ -12,45 +9,45 @@ const EXCLUDED_CONDITIONS = [
     'salvage',
 ];
 
-/**
- * Build the eBay search URL with all filters pre-applied
- */
+// Build search URL
 function buildSearchUrl(config = {}) {
     const {
-        query = 'nvidia rtx 3060 12gb',
-        maxPrice = 250,
+        query = 'apple mac mini m4',
+        maxPrice = 600,
     } = config;
 
     const baseUrl = 'https://www.ebay.com/sch/i.html';
     const params = new URLSearchParams({
         _nkw: query,
         _udhi: maxPrice.toString(),
-        LH_BIN: '1',                      // Buy It Now only
-        LH_ItemCondition: '1000|1500|2000|2500|3000', // New, Open Box, Refurbished, Seller Refurbished, Used
-        _sop: '15',                        // Sort by: Newly Listed
+        LH_BIN: '1',                      // Buy It Now
+        LH_ItemCondition: '1000|1500|2000|2500|3000', // Valid conditions
+        _sop: '15',                        // Newly listed
         LH_PrefLoc: '1',                   // US only
-        _ipg: '120',                       // Max results per page
+        _ipg: '120',                       // Max results
         rt: 'nc',
     });
 
     return `${baseUrl}?${params.toString()}`;
 }
 
-/**
- * Filter raw listings extracted from the DOM
- * @param {Array} rawListings - Raw listing objects from scraper's page.evaluate()
- * @param {Object} config - Configuration object with maxPrice, requiredKeywords, exclusionKeywords
- * @returns {Array} - Filtered listings that match all criteria
- */
+// Filter listings
 function filterListings(rawListings, config = {}) {
-    const { maxPrice = 250, requiredKeywords = '', exclusionKeywords = '' } = config;
+    const {
+        maxPrice = 250,
+        requiredKeywords = '',
+        exclusionKeywords = '',
+        id: targetId = null,
+        name: targetName = null,
+        category: targetCategory = null,
+    } = config;
     const required = requiredKeywords.split(',').map(k => k.trim().toLowerCase()).filter(k => k);
     const excluded = exclusionKeywords.split(',').map(k => k.trim().toLowerCase()).filter(k => k);
 
     const filtered = [];
     const rejectCounts = { noPrice: 0, priceHigh: 0, noKeyword: 0, excluded: 0, condition: 0 };
 
-    // Debug: show first 5 raw titles
+    // Debug preview
     console.log('[Parser] First 5 raw titles:');
     rawListings.slice(0, 5).forEach((l, i) => {
         console.log(`  ${i + 1}. price=$${l.price} total=$${l.totalPrice} title=${JSON.stringify((l.title || '').substring(0, 80))}`);
@@ -60,28 +57,28 @@ function filterListings(rawListings, config = {}) {
         const titleLower = (listing.title || '').toLowerCase();
         const subtitleLower = (listing.subtitle || '').toLowerCase();
 
-        // Must have valid price
+        // Validate price
         if (!listing.price || listing.price <= 0) { rejectCounts.noPrice++; continue; }
 
-        // Must be within price threshold
+        // Price threshold
         if (listing.totalPrice > maxPrice) { rejectCounts.priceHigh++; continue; }
 
-        // Must contain ANY of the required keywords (if specified)
+        // Required keywords
         if (required.length > 0 && !required.some((kw) => titleLower.includes(kw))) { rejectCounts.noKeyword++; continue; }
 
-        // Must NOT contain exclusion keywords
+        // Exclusion check
         const matchedExclusion = excluded.find((kw) => titleLower.includes(kw));
         if (matchedExclusion) { rejectCounts.excluded++; continue; }
 
-        // Must NOT be "for parts / not working"
+        // Condition check
         if (EXCLUDED_CONDITIONS.some((exc) => subtitleLower.includes(exc))) { rejectCounts.condition++; continue; }
         if (EXCLUDED_CONDITIONS.some((exc) => titleLower.includes(exc))) { rejectCounts.condition++; continue; }
 
-        // Extract condition from subtitle
+        // Extract condition
         const conditionParts = (listing.subtitle || '').split('·').map((s) => s.trim());
         const condition = conditionParts[0] || 'Unknown';
 
-        // Clean the URL
+        // Clean URL
         const cleanedUrl = cleanUrl(listing.url);
 
         filtered.push({
@@ -95,6 +92,11 @@ function filterListings(rawListings, config = {}) {
             url: cleanedUrl,
             image: listing.image,
             shippingText: listing.shippingText,
+            targetId: targetId || config.id || null,
+            targetName: targetName || config.name || config.projectName || 'General Target',
+            targetCategory: targetCategory || config.category || 'General',
+            targetMaxPrice: maxPrice,
+            targetUrgentPrice: config.urgentPrice || null,
             foundAt: new Date().toISOString(),
         });
     }
@@ -103,9 +105,7 @@ function filterListings(rawListings, config = {}) {
     return filtered;
 }
 
-/**
- * Clean eBay URL — keep only the essential item path
- */
+// Clean URL
 function cleanUrl(url) {
     try {
         const u = new URL(url);

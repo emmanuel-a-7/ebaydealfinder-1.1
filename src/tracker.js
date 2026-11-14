@@ -1,7 +1,4 @@
-// ============================================================
-// src/tracker.js — Listing Deduplication & Persistence
-// Tracks seen listings to avoid sending duplicate alerts
-// ============================================================
+// Listing tracker
 
 const fs = require('fs');
 const path = require('path');
@@ -9,13 +6,10 @@ const path = require('path');
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const SEEN_FILE = path.join(DATA_DIR, 'seen_listings.json');
 
-// How long to remember a listing (7 days in ms)
+// Expiry duration
 const EXPIRY_MS = 7 * 24 * 60 * 60 * 1000;
 
-/**
- * Load seen listings from disk
- * @returns {Object} Map of itemId -> { firstSeen, lastSeen }
- */
+// Load seen listings
 function loadSeenListings() {
     try {
         if (fs.existsSync(SEEN_FILE)) {
@@ -28,12 +22,10 @@ function loadSeenListings() {
     return {};
 }
 
-/**
- * Save seen listings to disk
- */
+// Save seen listings
 function saveSeenListings(seen) {
     try {
-        // Ensure data directory exists
+        // Ensure directory
         if (!fs.existsSync(DATA_DIR)) {
             fs.mkdirSync(DATA_DIR, { recursive: true });
         }
@@ -43,17 +35,12 @@ function saveSeenListings(seen) {
     }
 }
 
-/**
- * Filter out listings that have already been seen
- * Returns only NEW listings that haven't been alerted on
- * @param {Array} listings - All parsed listings
- * @returns {Array} - Only new/unseen listings
- */
+// Filter new listings
 function filterNewListings(listings) {
     const seen = loadSeenListings();
     const now = Date.now();
 
-    // Clean up expired entries
+    // Clean expired
     let cleaned = 0;
     for (const [id, data] of Object.entries(seen)) {
         if (now - new Date(data.firstSeen).getTime() > EXPIRY_MS) {
@@ -77,12 +64,12 @@ function filterNewListings(listings) {
                 price: listing.totalPrice,
             };
         } else {
-            // Update last seen timestamp
+            // Update timestamp
             seen[listing.itemId].lastSeen = listing.foundAt;
         }
     }
 
-    // Save updated state
+    // Save state
     saveSeenListings(seen);
 
     console.log(
@@ -92,9 +79,7 @@ function filterNewListings(listings) {
     return newListings;
 }
 
-/**
- * Get stats about tracked listings
- */
+// Tracker stats
 function getTrackerStats() {
     const seen = loadSeenListings();
     return {
@@ -103,9 +88,7 @@ function getTrackerStats() {
     };
 }
 
-/**
- * Clear all tracked listings (reset)
- */
+// Clear listings
 function clearTrackedListings() {
     saveSeenListings({});
     console.log('[Tracker] All tracked listings cleared.');

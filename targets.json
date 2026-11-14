@@ -1,0 +1,52 @@
+[
+  {
+    "id": "rtx-5060ti-16gb",
+    "name": "NVIDIA RTX 5060ti 16GB",
+    "category": "GPU",
+    "query": "nvidia rtx 5060ti 16gb",
+    "maxPrice": 600,
+    "requiredKeywords": "5060ti",
+    "exclusionKeywords": "5060 ti, 5060ti, 5060ti super, box only, no gpu, empty box, laptop, desktop pc, gaming pc, prebuilt, parts for",
+    "enabled": true
+  },
+  {
+    "id": "mac-mini-m4",
+    "name": "Apple Mac Mini M4",
+    "category": "Desktop",
+    "query": "apple mac mini m4",
+    "maxPrice": 600,
+    "requiredKeywords": "mac mini, m4",
+    "exclusionKeywords": "m1, m2, intel, box only, broken, parts, mount only, hub only, stand, hub, dock, A1347, docking, i5, i7, i3, station, kit, enclosure, Part, Mount, Stand, cage, OEM, heat",
+    "enabled": true
+  },
+  {
+    "id": "rtx-5070-12gb",
+    "name": "NVIDIA RTX 5070 12GB",
+    "category": "Desktop",
+    "query": "nvidia rtx 5070 12gb",
+    "maxPrice": 660,
+    "requiredKeywords": "5070",
+    "exclusionKeywords": "5070 ti, 5070ti, box only, empty box, laptop, desktop pc, gaming pc, prebuilt, for parts, box",
+    "enabled": true
+  },
+  {
+    "id": "rx-9070-xt-16gb",
+    "name": "AMD Radeon RX 9070 XT 16GB",
+    "category": "GPU",
+    "query": "amd radeon rx 9070 xt",
+    "maxPrice": 600,
+    "requiredKeywords": "9070, xt",
+    "exclusionKeywords": "non-xt, non xt, 9070 gre, 9060, 7900, box only, no gpu, empty box, broken, parts only, cooler only, fan only, shroud, backplate, heatsink, waterblock, desktop pc, full build, prebuilt, pre-built, gaming pc, bundle with, 5500, 5600, 5700, 5800, 5900, 6400, 6500, 6600, 6700, 6800, 6900, 7500, 7600, 7700, 7800, 6650, 6750, 6850, 6950, 7650, 7750, 7850, 7950, 560, 570, 580, 590",
+    "enabled": true
+  },
+  {
+    "id": "rtx-5080-16gb",
+    "name": "NVIDIA RTX 5080 16GB",
+    "category": "Desktop",
+    "query": "nvidia rtx 5080 16gb",
+    "maxPrice": 900,
+    "requiredKeywords": "5080",
+    "exclusionKeywords": "5080, 5080 ti, 5080ti, 5080ti, box only, empty box, laptop, desktop pc, gaming pc, prebuilt, for parts",
+    "enabled": true
+  }
+]

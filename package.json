@@ -1,7 +1,7 @@
 {
-  "name": "ebay-rtx3060-scraper",
+  "name": "ebay-deal-scraper",
   "version": "1.0.0",
-  "description": "eBay RTX 3060 12GB deal scraper with Discord notifications and web dashboard",
+  "description": "High-value multi-deal eBay scraper with Discord notifications and web dashboard",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

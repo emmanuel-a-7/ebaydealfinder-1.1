@@ -1,8 +1,4 @@
-// ============================================================
-// src/scraper.js — Stealth Browser Engine (Crawlbase-style)
-// Uses Puppeteer + Stealth Plugin to bypass eBay bot detection
-// Extracts listing data directly from the LIVE DOM
-// ============================================================
+// Stealth scraper
 
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
@@ -41,6 +37,7 @@ class StealthScraper {
 
     async launch() {
         const viewport = getRandomViewport();
+        const ua = getRandomUserAgent();
         this.browser = await puppeteer.launch({
             headless: 'new',
             args: [
@@ -49,9 +46,8 @@ class StealthScraper {
                 '--disable-blink-features=AutomationControlled',
                 '--disable-infobars',
                 '--disable-dev-shm-usage',
+                `--user-agent=${ua}`,
                 `--window-size=${viewport.width},${viewport.height}`,
-                '--disable-accelerated-2d-canvas',
-                '--disable-gpu',
                 '--lang=en-US,en',
             ],
             defaultViewport: viewport,
@@ -60,9 +56,7 @@ class StealthScraper {
         return this;
     }
 
-    /**
-     * Scrape eBay search results — extracts from live DOM using page.evaluate()
-     */
+    // Scrape listings
     async scrapeListings(url, maxRetries = 3) {
         if (!this.browser) await this.launch();
 
@@ -72,31 +66,13 @@ class StealthScraper {
             const page = await this.browser.newPage();
 
             try {
-                await page.setUserAgent(getRandomUserAgent());
-                await page.setExtraHTTPHeaders({
-                    'Accept-Language': 'en-US,en;q=0.9',
-                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-                    'Accept-Encoding': 'gzip, deflate, br',
-                    'Sec-Fetch-Dest': 'document',
-                    'Sec-Fetch-Mode': 'navigate',
-                    'Sec-Fetch-Site': 'none',
-                    'Sec-Fetch-User': '?1',
-                });
-
-                // Block fonts/media to reduce load time
-                await page.setRequestInterception(true);
-                page.on('request', req => {
-                    if (['font', 'media'].includes(req.resourceType())) req.abort();
-                    else req.continue();
-                });
-
                 await randomDelay(800, 1800);
                 console.log(`[Scraper] Attempt ${attempt}/${maxRetries} — ${url.substring(0, 80)}...`);
 
                 const res = await page.goto(url, { waitUntil: 'networkidle2', timeout: 45000 });
                 if (!res || res.status() >= 400) throw new Error(`HTTP ${res?.status() || '?'}`);
 
-                // Wait for content + scroll to trigger lazy-load images
+                // Lazy load scroll
                 await randomDelay(1500, 3000);
                 await page.evaluate(async () => {
                     await new Promise(resolve => {
@@ -110,22 +86,22 @@ class StealthScraper {
                 });
                 await randomDelay(800, 1500);
 
-                // ── Live DOM extraction ─────────────────────────────
+                // DOM extraction
                 const data = await page.evaluate(() => {
 
-                    // ─── Helper: clean text ──────────────────────────────
+                    // Clean text helper
                     function cleanText(el) {
                         if (!el) return '';
-                        // Remove screen-reader-only spans (like "Opens in new tab")
+                        // Remove hidden spans
                         const clone = el.cloneNode(true);
                         clone.querySelectorAll('.clipped, [class*="clipped"], sr-only').forEach(e => e.remove());
                         return clone.textContent.replace(/\s+/g, ' ').trim();
                     }
 
-                    // ─── Helper: parse price ─────────────────────────────
+                    // Parse price helper
                     function parsePrice(text) {
                         if (!text) return null;
-                        // Handle ranges "X to Y" — take the lower
+                        // Lower range price
                         const parts = text.split(/ to /i);
                         const m = parts[0].match(/([\d,]+\.?\d*)/);
                         return m ? parseFloat(m[1].replace(/,/g, '')) : null;
@@ -133,32 +109,29 @@ class StealthScraper {
 
                     const results = [];
 
-                    // ─── Find all eBay item links (href contains /itm/) ─
-                    // Focus on the SRP results section if available
+                    // Find item links
                     const srpRoot = document.querySelector(
                         '.srp-river-results, ul.srp-results__list, .srp-results'
                     ) || document.body;
 
-                    // Collect all unique /itm/ links within the SRP section
+                    // Collect links
                     const allLinks = Array.from(srpRoot.querySelectorAll('a[href*="/itm/"]'));
 
-                    // Build a map of itemId → closest "card" ancestor
+                    // Map card containers
                     const cardMap = new Map();
                     for (const link of allLinks) {
                         const href = link.href || '';
                         const m = href.match(/\/itm\/(\d+)/);
                         if (!m) continue;
                         const itemId = m[1];
-                        if (cardMap.has(itemId)) continue; // already found
+                        if (cardMap.has(itemId)) continue; // Skip existing
 
-                        // Walk up the DOM to find the card container
-                        // We want the element that contains price, title, image together
-                        // Typically 4-7 levels above the link in eBay's SRP
+                        // Find card container
                         let el = link;
                         for (let i = 0; i < 8; i++) {
                             if (!el.parentElement) break;
                             el = el.parentElement;
-                            // Found a good card container if it has a price
+                            // Check container
                             const hasPriceEl = el.querySelector(
                                 '.s-card__price, .s-item__price, [class*="s-card__price"]'
                             );
@@ -169,11 +142,11 @@ class StealthScraper {
                         }
                     }
 
-                    // ─── Extract data from each card ─────────────────────
+                    // Extract card data
                     for (const [itemId, { card, link }] of cardMap.entries()) {
 
                         try {
-                            // TITLE
+                            // Title
                             let title = '';
                             const titleEl = card.querySelector(
                                 '.s-card__title, .s-item__title, [role="heading"]'
@@ -190,7 +163,7 @@ class StealthScraper {
                             }
                             if (!title || title.length < 8) continue;
 
-                            // PRICE — find the dedicated price element (not shipping cost)
+                            // Price
                             let price = null;
                             const priceEl = card.querySelector(
                                 '.s-card__price, .s-item__price, [class*="s-card__price"]'
@@ -200,27 +173,27 @@ class StealthScraper {
                             }
                             if (!price || price <= 0) continue;
 
-                            // CONDITION / SUBTITLE
+                            // Condition
                             let subtitle = '';
                             const subEl = card.querySelector(
                                 '.s-card__subtitle, .s-item__subtitle, .SECONDARY_INFO'
                             );
                             if (subEl) subtitle = cleanText(subEl);
 
-                            // IMAGE
+                            // Image
                             const imgEl = card.querySelector('img.s-card__image, img');
                             const image = imgEl?.src || imgEl?.getAttribute('data-src') || '';
 
-                            // SHIPPING — scan attribute rows for shipping cost
+                            // Shipping cost
                             let shippingCost = 0;
-                            let shippingText = 'Free shipping'; // default to free
+                            let shippingText = 'Free shipping'; // Default free
                             const cardText = card.textContent.toLowerCase();
 
                             if (cardText.includes('free shipping') || cardText.includes('free delivery')) {
                                 shippingCost = 0;
                                 shippingText = 'Free shipping';
                             } else {
-                                // Look for "+$X.XX shipping" or "+$X.XX delivery"
+                                // Parse shipping
                                 const attrRows = card.querySelectorAll(
                                     '.s-card__attribute-row, .s-item__shipping'
                                 );
@@ -286,6 +259,98 @@ class StealthScraper {
         }
 
         throw new Error(`Failed after ${maxRetries} attempts: ${lastError?.message}`);
+    }
+
+    // Scrape multiple targets
+    async scrapeMultiTargets(targets, buildSearchUrlFn, filterListingsFn, options = {}) {
+        const {
+            interQueryDelayMs = 4000,
+            onTargetProgress = null,
+        } = options;
+
+        if (!this.browser) await this.launch();
+
+        const activeTargets = targets.filter(t => t.enabled !== false);
+        console.log(`[Scraper] Starting multi-target batch scan across ${activeTargets.length} active target(s)...`);
+
+        const allMatchingListings = [];
+        const targetSummaries = [];
+
+        for (let i = 0; i < activeTargets.length; i++) {
+            const target = activeTargets[i];
+            console.log(`\n[Scraper] Target ${i + 1}/${activeTargets.length}: "${target.name}" ($${target.maxPrice} max)`);
+
+            if (onTargetProgress) {
+                onTargetProgress({
+                    index: i + 1,
+                    total: activeTargets.length,
+                    target,
+                    status: 'starting'
+                });
+            }
+
+            try {
+                const searchUrl = buildSearchUrlFn(target);
+                const rawListings = await this.scrapeListings(searchUrl, 2);
+                const filtered = filterListingsFn(rawListings, target);
+
+                allMatchingListings.push(...filtered);
+                targetSummaries.push({
+                    targetId: target.id,
+                    targetName: target.name,
+                    category: target.category,
+                    rawCount: rawListings.length,
+                    matchCount: filtered.length,
+                    status: 'success'
+                });
+
+                if (onTargetProgress) {
+                    onTargetProgress({
+                        index: i + 1,
+                        total: activeTargets.length,
+                        target,
+                        status: 'completed',
+                        rawCount: rawListings.length,
+                        matchCount: filtered.length,
+                    });
+                }
+            } catch (err) {
+                console.error(`[Scraper] [ERROR] Target "${target.name}" failed: ${err.message}`);
+                targetSummaries.push({
+                    targetId: target.id,
+                    targetName: target.name,
+                    category: target.category,
+                    rawCount: 0,
+                    matchCount: 0,
+                    status: 'error',
+                    error: err.message
+                });
+
+                if (onTargetProgress) {
+                    onTargetProgress({
+                        index: i + 1,
+                        total: activeTargets.length,
+                        target,
+                        status: 'failed',
+                        error: err.message
+                    });
+                }
+            }
+
+            // Jitter delay
+            if (i < activeTargets.length - 1) {
+                const jitter = Math.floor(Math.random() * 2000) - 1000;
+                const waitTime = Math.max(1500, interQueryDelayMs + jitter);
+                console.log(`[Scraper] Jitter delay (${(waitTime / 1000).toFixed(1)}s) before next target...`);
+                await randomDelay(waitTime - 500, waitTime + 500);
+            }
+        }
+
+        console.log(`[Scraper] [OK] Multi-target scan complete: ${allMatchingListings.length} total matches across ${activeTargets.length} targets.`);
+        return {
+            listings: allMatchingListings,
+            summaries: targetSummaries,
+        };
     }
 
     async close() {

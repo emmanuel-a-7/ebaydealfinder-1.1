@@ -1,7 +1,4 @@
-// ============================================================
-// index.js — eBay RTX 3060 12GB Deal Scraper
-// Main entry point: orchestrates scanning, parsing, and alerts
-// ============================================================
+// Scanner runner
 
 require('dotenv').config();
 const cron = require('node-cron');
@@ -15,7 +12,7 @@ const {
     sendErrorNotification,
 } = require('./src/discord');
 
-// ── Configuration ─────────────────────────────────────────────
+// Configuration
 const fs = require('fs');
 const path = require('path');
 const CONFIG_FILE = path.join(__dirname, 'config.json');
@@ -23,11 +20,11 @@ const CONFIG_FILE = path.join(__dirname, 'config.json');
 const DEFAULT_CONFIG = {
     webhookUrl: process.env.DISCORD_WEBHOOK_URL || '',
     intervalMinutes: parseInt(process.env.SCAN_INTERVAL_MINUTES, 10) || 10,
-    maxPrice: parseInt(process.env.MAX_PRICE, 10) || 250,
-    query: process.env.SEARCH_QUERY || 'nvidia rtx 3060 12gb',
-    projectName: process.env.PROJECT_NAME || 'Deal Hunter',
-    requiredKeywords: '3060',
-    exclusionKeywords: '3060 ti, 3060ti, 3060m, mobile pcie, box only, no gpu, no graphics card, empty box, empty retail box, baffle plate, bracket for, fan only, heatsink only, backplate only, cooler only, shroud only, parts for, card box, laptop, notebook, desktop pc, full build, whole computer, gaming pc, prebuilt, pre-built,  8gb , mining rig, bundle with',
+    maxPrice: parseInt(process.env.MAX_PRICE, 10) || 600,
+    query: process.env.SEARCH_QUERY || '',
+    projectName: process.env.PROJECT_NAME || 'High-Value Multi-Deal Finder',
+    requiredKeywords: '',
+    exclusionKeywords: 'box only, empty box, broken, parts, for parts',
 };
 
 let CONFIG = { ...DEFAULT_CONFIG };
@@ -45,16 +42,33 @@ CONFIG.dryRun = process.env.DRY_RUN === 'true' || process.argv.includes('--dry-r
 
 // Validate config
 if (!CONFIG.webhookUrl && !CONFIG.dryRun) {
-    console.error('❌ DISCORD_WEBHOOK_URL is required. Set it in .env or pass --dry-run for testing.');
+    console.error('[ERROR] DISCORD_WEBHOOK_URL is required. Set it in .env or pass --dry-run for testing.');
     process.exit(1);
 }
 
-// ── Globals ───────────────────────────────────────────────────
+// Globals
 let scraper = null;
 let isScanning = false;
 let scanCount = 0;
 
-// ── Core Scan Function ───────────────────────────────────────
+const TARGETS_FILE = path.join(__dirname, 'targets.json');
+
+function loadTargets() {
+    try {
+        if (fs.existsSync(TARGETS_FILE)) {
+            const data = fs.readFileSync(TARGETS_FILE, 'utf8');
+            const targets = JSON.parse(data);
+            if (Array.isArray(targets) && targets.length > 0) {
+                return targets;
+            }
+        }
+    } catch (e) {
+        console.error('[Config] Failed to load targets.json:', e.message);
+    }
+    return null;
+}
+
+// Core scan
 async function runScan() {
     if (isScanning) {
         console.log('[Main] Scan already in progress, skipping...');
@@ -66,48 +80,63 @@ async function runScan() {
     const startTime = Date.now();
 
     console.log('\n' + '═'.repeat(60));
-    console.log(`[Main] 🔍 Starting scan #${scanCount} at ${new Date().toLocaleString()}`);
+    console.log(`[Main] Starting scan #${scanCount} at ${new Date().toLocaleString()}`);
     console.log('═'.repeat(60));
 
     try {
-        // Build search URL
-        const searchUrl = buildSearchUrl(CONFIG);
-        console.log(`[Main] Search URL: ${searchUrl.substring(0, 100)}...`);
+        const targets = loadTargets();
+        let allListings = [];
 
-        // Scrape listings directly from live DOM (bypasses static HTML parsing issues)
-        const rawListings = await scraper.scrapeListings(searchUrl);
-        console.log(`[Main] Raw listings extracted from DOM: ${rawListings.length}`);
+        if (targets && targets.some(t => t.enabled !== false)) {
+            const activeTargets = targets.filter(t => t.enabled !== false);
+            console.log(`[Main] Executing multi-target scan across ${activeTargets.length} active target(s)`);
 
-        // Apply our filters (price, condition, title keywords)
-        const allListings = filterListings(rawListings, CONFIG);
-        console.log(`[Main] After filtering: ${allListings.length} matching listings`);
+            const delayMs = (CONFIG.interQueryDelaySec || 4) * 1000;
+            const res = await scraper.scrapeMultiTargets(
+                targets,
+                buildSearchUrl,
+                filterListings,
+                { interQueryDelayMs: delayMs }
+            );
+            allListings = res.listings;
+        } else {
+            // Fallback search
+            console.log(`[Main] Single query mode: ${CONFIG.query}`);
+            const searchUrl = buildSearchUrl(CONFIG);
+            const rawListings = await scraper.scrapeListings(searchUrl);
+            allListings = filterListings(rawListings, CONFIG);
+        }
 
-        // Log all matches to console
+        console.log(`[Main] Total matching listings found: ${allListings.length}`);
+
+        // Log matches
         if (allListings.length > 0) {
-            console.log('\n[Main] All matching listings:');
-            allListings.forEach((listing, i) => {
-                console.log(`  ${i + 1}. $${listing.totalPrice.toFixed(2)} | ${listing.condition} | ${listing.title.substring(0, 60)}`);
+            console.log('\n[Main] Matching listings preview:');
+            allListings.slice(0, 10).forEach((listing, i) => {
+                const targetLabel = listing.targetName ? `[${listing.targetName}] ` : '';
+                console.log(`  ${i + 1}. ${targetLabel}$${listing.totalPrice.toFixed(2)} | ${listing.condition} | ${listing.title.substring(0, 60)}`);
             });
         }
 
-        // Filter for new (unseen) listings only
+        // Filter new listings
         const newListings = filterNewListings(allListings);
 
-        // Send Discord alerts for new listings
+        // Send alerts
         if (newListings.length > 0 && !CONFIG.dryRun) {
-            console.log(`\n[Main] 🚨 ${newListings.length} NEW listing(s) — sending Discord alerts!`);
+            console.log(`\n[Main] ${newListings.length} NEW listing(s) — sending Discord alerts!`);
             await sendListingAlerts(CONFIG.webhookUrl, newListings, CONFIG);
         } else if (newListings.length > 0 && CONFIG.dryRun) {
-            console.log(`\n[Main] 🧪 DRY RUN — would send ${newListings.length} Discord alerts`);
+            console.log(`\n[Main] [DRY RUN] — would send ${newListings.length} Discord alerts:`);
             newListings.forEach((l, i) => {
-                console.log(`  NEW ${i + 1}: $${l.totalPrice.toFixed(2)} — ${l.title}`);
+                const targetLabel = l.targetName ? `[${l.targetName}] ` : '';
+                console.log(`  NEW ${i + 1}: ${targetLabel}$${l.totalPrice.toFixed(2)} — ${l.title}`);
                 console.log(`         ${l.url}`);
             });
         } else {
             console.log('\n[Main] No new listings since last scan.');
         }
 
-        // Send scan summary (skip in dry run)
+        // Send summary
         if (!CONFIG.dryRun) {
             const nextScan = new Date(Date.now() + CONFIG.intervalMinutes * 60 * 1000);
             await sendScanSummary(
@@ -119,10 +148,10 @@ async function runScan() {
         }
 
         const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-        console.log(`[Main] ✅ Scan #${scanCount} complete in ${elapsed}s`);
+        console.log(`[Main] [OK] Scan #${scanCount} complete in ${elapsed}s`);
 
     } catch (error) {
-        console.error(`[Main] ❌ Scan failed: ${error.message}`);
+        console.error(`[Main] [ERROR] Scan failed: ${error.message}`);
         if (!CONFIG.dryRun && CONFIG.webhookUrl) {
             await sendErrorNotification(CONFIG.webhookUrl, error.message, CONFIG);
         }
@@ -131,56 +160,56 @@ async function runScan() {
     }
 }
 
-// ── Main Entry Point ─────────────────────────────────────────
+// Main entry
 async function main() {
     console.log('╔══════════════════════════════════════════════════════╗');
     console.log(`║   ${CONFIG.projectName.padEnd(46)} ║`);
     console.log('╚══════════════════════════════════════════════════════╝');
     console.log('');
-    console.log(`  Search:    ${CONFIG.query}`);
+    console.log(`  Search:    ${CONFIG.query || 'Multi-Target'}`);
     console.log(`  Max Price: $${CONFIG.maxPrice}`);
     console.log(`  Interval:  Every ${CONFIG.intervalMinutes} minutes`);
     console.log(`  Dry Run:   ${CONFIG.dryRun}`);
-    console.log(`  Webhook:   ${CONFIG.dryRun ? 'N/A (dry run)' : '✅ Connected'}`);
+    console.log(`  Webhook:   ${CONFIG.dryRun ? 'N/A (dry run)' : '[OK] Connected'}`);
     console.log('');
 
-    // Initialize stealth scraper
+    // Init scraper
     scraper = new StealthScraper();
     await scraper.launch();
 
-    // Send startup notification
+    // Startup notification
     if (!CONFIG.dryRun) {
         await sendStartupNotification(CONFIG.webhookUrl, CONFIG);
     }
 
-    // Run first scan immediately
+    // Initial scan
     await runScan();
 
-    // If dry run, close and exit
+    // Dry run exit
     if (CONFIG.dryRun) {
         console.log('\n[Main] Dry run complete. Exiting.');
         await scraper.close();
         process.exit(0);
     }
 
-    // Schedule recurring scans
+    // Schedule scans
     const cronExpression = `*/${CONFIG.intervalMinutes} * * * *`;
-    console.log(`\n[Main] ⏰ Scheduling scans with cron: "${cronExpression}"`);
+    console.log(`\n[Main] Scheduling scans with cron: "${cronExpression}"`);
 
     cron.schedule(cronExpression, async () => {
-        // Restart browser periodically to avoid memory leaks and refresh fingerprint
+        // Recycle browser
         if (scanCount % 6 === 0) {
-            console.log('[Main] 🔄 Recycling browser instance...');
+            console.log('[Main] Recycling browser instance...');
             await scraper.close();
             await scraper.launch();
         }
         await runScan();
     });
 
-    console.log('[Main] 🟢 Scraper is running. Press Ctrl+C to stop.\n');
+    console.log('[Main] Scraper is running. Press Ctrl+C to stop.\n');
 }
 
-// ── Graceful Shutdown ────────────────────────────────────────
+// Shutdown
 async function shutdown(signal) {
     console.log(`\n[Main] Received ${signal}. Shutting down gracefully...`);
     if (scraper) {
@@ -192,12 +221,12 @@ async function shutdown(signal) {
 process.on('SIGINT', () => shutdown('SIGINT'));
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 
-// Handle unhandled rejections
+// Error handling
 process.on('unhandledRejection', (error) => {
     console.error('[Main] Unhandled rejection:', error);
 });
 
-// Start the scraper
+// Start scraper
 main().catch((error) => {
     console.error('[Main] Fatal error:', error);
     process.exit(1);

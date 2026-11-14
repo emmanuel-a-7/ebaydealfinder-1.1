@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RTX 3060 Deal Hunter — eBay Monitor</title>
+    <title>High-Value Deal Hunter — eBay Monitor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet" />
     <style>
-        /* ── Reset & Root ──────────────────────────────────── */
+        /* Reset & root */
         *,
         *::before,
         *::after {
@@ -49,7 +49,7 @@
             overflow-x: hidden;
         }
 
-        /* ── Animated Background ─────────────────────────── */
+        /* Animated background */
         .bg-grid {
             position: fixed;
             inset: 0;
@@ -73,7 +73,7 @@
             z-index: 0;
         }
 
-        /* ── Layout ──────────────────────────────────────── */
+        /* Layout */
         .wrapper {
             position: relative;
             z-index: 1;
@@ -82,7 +82,7 @@
             padding: 0 24px;
         }
 
-        /* ── Header ──────────────────────────────────────── */
+        /* Header */
         header {
             padding: 28px 0 0;
             display: flex;
@@ -164,7 +164,7 @@
             }
         }
 
-        /* ── Stat Grid ───────────────────────────────────── */
+        /* Stat grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
@@ -252,7 +252,7 @@
             color: var(--orange);
         }
 
-        /* ── Controls Bar ────────────────────────────────── */
+        /* Controls bar */
         .controls-bar {
             display: flex;
             align-items: center;
@@ -355,7 +355,7 @@
             color: var(--border2);
         }
 
-        /* ── Main Content Grid ───────────────────────────── */
+        /* Main content grid */
         .main-grid {
             display: grid;
             grid-template-columns: 1fr 360px;
@@ -369,7 +369,7 @@
             }
         }
 
-        /* ── Panel ───────────────────────────────────────── */
+        /* Panel */
         .panel {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -403,7 +403,7 @@
             color: var(--accent);
         }
 
-        /* ── Search bar ──────────────────────────────────── */
+        /* Search bar */
         .search-bar {
             padding: 14px 22px;
             border-bottom: 1px solid var(--border);
@@ -448,7 +448,7 @@
             border-color: var(--accent);
         }
 
-        /* ── Listings ────────────────────────────────────── */
+        /* Listings */
         .listings-container {
             padding: 14px;
             max-height: 680px;
@@ -656,14 +656,14 @@
             }
         }
 
-        /* ── Right Column ────────────────────────────────── */
+        /* Right column */
         .right-col {
             display: flex;
             flex-direction: column;
             gap: 16px;
         }
 
-        /* ── Scan Progress ───────────────────────────────── */
+        /* Scan progress */
         .scan-status {
             padding: 20px 22px;
         }
@@ -728,7 +728,7 @@
             margin-top: 6px;
         }
 
-        /* ── Alert History ───────────────────────────────── */
+        /* Alert history */
         .alerts-container {
             padding: 12px;
             max-height: 300px;
@@ -798,7 +798,7 @@
             color: var(--muted);
         }
 
-        /* ── Log Panel ───────────────────────────────────── */
+        /* Log panel */
         .log-container {
             padding: 12px;
             max-height: 250px;
@@ -859,7 +859,7 @@
             color: var(--yellow);
         }
 
-        /* ── Discord Section ─────────────────────────────── */
+        /* Discord section */
         .discord-status {
             padding: 18px 22px;
         }
@@ -900,7 +900,7 @@
             color: var(--red);
         }
 
-        /* ── Toast Notification ──────────────────────────── */
+        /* Toast notification */
         #toast-container {
             position: fixed;
             bottom: 24px;
@@ -953,7 +953,7 @@
             border-color: var(--accent);
         }
 
-        /* ── Config Modal ────────────────────────────────── */
+        /* Config modal */
         .modal-backdrop {
             position: fixed;
             inset: 0;
@@ -1031,9 +1031,111 @@
             margin-top: 24px;
         }
 
-        .modal-btns .btn {
-            flex: 1;
-            justify-content: center;
+        /* Target badges */
+        .badge-target {
+            background: rgba(124, 58, 237, 0.18);
+            color: #a855f7;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        .targets-modal-content {
+            max-width: 850px !important;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .target-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
+            max-height: 55vh;
+            overflow-y: auto;
+            padding-right: 4px;
+            margin-top: 14px;
+        }
+
+        .target-card {
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+
+        .target-card.disabled {
+            opacity: 0.5;
+            border-style: dashed;
+        }
+
+        .target-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .target-card-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 38px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: var(--border2);
+            transition: .3s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--green);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(18px);
+        }
+
+        .target-meta {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+
+        .target-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -1047,7 +1149,9 @@
         <!-- Header -->
         <header>
             <div class="logo">
-                <div class="logo-icon">🎮</div>
+                <div class="logo-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                </div>
                 <div>
                     <h1 id="ui-project-name">Deal Hunter</h1>
                     <p>eBay Bot-Bypass Scanner · Discord Alerts · Real-Time</p>
@@ -1058,6 +1162,14 @@
                 <span id="ws-label">Connecting...</span>
             </div>
         </header>
+
+        <!-- Config Notice -->
+        <div id="config-notice" style="background: rgba(91, 127, 255, 0.15); border: 1px solid var(--accent); padding: 12px 24px; border-radius: 12px; margin: 20px 0; display: none; justify-content: space-between; align-items: center;">
+            <div style="font-size: 0.85rem;">
+                <strong>Missing Configuration:</strong> Please click <strong>Settings</strong> to set up your search query and webhook.
+            </div>
+            <button class="btn btn-primary" onclick="openSettingsModal()" style="padding: 6px 12px;">Configure Now</button>
+        </div>
 
         <!-- Stats -->
         <div class="stats-grid">
@@ -1077,18 +1189,19 @@
                 <div class="stat-sub">since start</div>
             </div>
             <div class="stat-card orange">
-                <div class="stat-label">Max Budget</div>
-                <div class="stat-value val-orange" id="stat-price">$250</div>
-                <div class="stat-sub">including shipping</div>
+                <div class="stat-label">Active Targets</div>
+                <div class="stat-value val-orange" id="stat-targets">0/0</div>
+                <div class="stat-sub">high-value queries enabled</div>
             </div>
         </div>
 
         <div class="controls-bar">
             <button class="btn btn-primary" id="btn-scan" onclick="triggerScan()">
-                <span>⚡</span> Scan Now
+                Scan Now
             </button>
-            <button class="btn btn-ghost" onclick="openSettingsModal()">⚙️ Settings</button>
-            <button class="btn btn-danger" onclick="resetData()">🗑️ Reset History</button>
+            <button class="btn btn-ghost" onclick="openTargetsModal()" style="border-color: var(--accent); color: var(--accent);">Target Manager</button>
+            <button class="btn btn-ghost" onclick="openSettingsModal()">Settings</button>
+            <button class="btn btn-danger" onclick="resetData()">Reset History</button>
             <button class="btn btn-ghost" onclick="toggleSort()" id="sort-toggle">Sort: Newest</button>
         </div>
 
@@ -1098,18 +1211,18 @@
             <!-- Listings Panel -->
             <div class="panel">
                 <div class="panel-header">
-                    <h2>🔍 Live Listings <span class="panel-count" id="listing-count">0</span></h2>
+                    <h2>Live Listings <span class="panel-count" id="listing-count">0</span></h2>
                     <div style="font-size:0.75rem; color:var(--muted)" id="ui-query">...</div>
                 </div>
                 <div class="search-bar">
                     <input type="text" placeholder="Filter results…" id="filter-input" oninput="filterListings()" />
-                    <button class="sort-btn" onclick="filterByNew()" id="btn-filter-new">🆕 New Only</button>
-                    <button class="sort-btn" onclick="filterByBest()" id="btn-filter-best">💎 Best Deals</button>
+                    <button class="sort-btn" onclick="filterByNew()" id="btn-filter-new">New Only</button>
+                    <button class="sort-btn" onclick="filterByBest()" id="btn-filter-best">Best Deals</button>
                     <button class="sort-btn active" onclick="clearFilter()" id="btn-filter-all">All</button>
                 </div>
                 <div class="listings-container" id="listings-container">
                     <div class="empty-state">
-                        <div class="empty-icon">🔍</div>
+                        <div class="empty-icon">[...]</div>
                         <h3>Connecting to eBay...</h3>
                         <p>The bot-bypass scraper is warming up.<br />Results will appear here in seconds.</p>
                     </div>
@@ -1122,7 +1235,7 @@
                 <!-- Scan Status -->
                 <div class="panel">
                     <div class="panel-header">
-                        <h2>📡 Scan Status</h2>
+                        <h2>Scan Status</h2>
                     </div>
                     <div class="scan-status">
                         <div class="scan-status-row">
@@ -1149,18 +1262,20 @@
                 <!-- Discord Status -->
                 <div class="panel">
                     <div class="panel-header">
-                        <h2>💬 Discord Alerts</h2>
+                        <h2>Discord Alerts</h2>
                     </div>
                     <div class="discord-status">
                         <div class="discord-row" style="margin-bottom:16px">
-                            <div class="discord-icon">💬</div>
+                            <div class="discord-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            </div>
                             <div class="discord-info">
                                 <h3>Webhook Status</h3>
                                 <p class="discord-ok" id="discord-status-text">Checking...</p>
                             </div>
                         </div>
                         <div class="panel-header" style="padding: 0; border:none; margin-bottom:8px;">
-                            <h2>📨 Alert History</h2>
+                            <h2>Alert History</h2>
                         </div>
                         <div class="alerts-container" id="alerts-container">
                             <div style="text-align:center; padding:20px; color:var(--muted); font-size:0.8rem;">No
@@ -1172,7 +1287,7 @@
                 <!-- Log Panel -->
                 <div class="panel">
                     <div class="panel-header">
-                        <h2>📋 Scan Log</h2>
+                        <h2>Scan Log</h2>
                     </div>
                     <div class="log-container" id="log-container">
                         <div class="log-entry"><span class="log-time">--:--:--</span><span class="log-info">Waiting for
@@ -1188,7 +1303,7 @@
     
     <div class="modal-backdrop" id="settings-modal" onclick="if(event.target===this) closeSettingsModal()">
         <div class="modal">
-            <h2>⚙️ Scraper Configuration</h2>
+            <h2>Scraper Configuration</h2>
             <div class="form-group">
                 <label>Project Name (Discord Bot Name)</label>
                 <input type="text" id="modal-project" placeholder="e.g. PS5 Deal Hunter" />
@@ -1226,21 +1341,79 @@
         </div>
     </div>
 
+    <!-- Targets Modal -->
+    <div class="modal-backdrop" id="targets-modal" onclick="if(event.target===this) closeTargetsModal()">
+        <div class="modal targets-modal-content">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2>High-Value Targets Manager (<span id="target-count-badge">0</span>)</h2>
+                <button class="btn btn-primary" onclick="openEditTargetModal()" style="padding: 6px 12px; font-size: 0.78rem;">+ Add Custom Target</button>
+            </div>
+            <p style="font-size:0.78rem; color:var(--muted); margin-top:4px;">Manage 10-20 high-value targets to monitor simultaneously with stealth anti-bot query rotation.</p>
+
+            <div class="target-grid" id="target-grid">
+                <!-- Populated dynamically -->
+            </div>
+
+            <div class="modal-btns">
+                <button class="btn btn-ghost" onclick="closeTargetsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Target modal -->
+    <div class="modal-backdrop" id="edit-target-modal" onclick="if(event.target===this) closeEditTargetModal()">
+        <div class="modal">
+            <h2 id="edit-target-modal-title">Add High-Value Target</h2>
+            <input type="hidden" id="target-edit-id" />
+            <div class="form-group">
+                <label>Target Name</label>
+                <input type="text" id="target-edit-name" placeholder="e.g. PlayStation 5 Slim" />
+            </div>
+            <div style="display:flex; gap:10px;">
+                <div class="form-group" style="flex:1;">
+                    <label>Category</label>
+                    <input type="text" id="target-edit-category" placeholder="e.g. Console, GPU, Laptop" />
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <label>Max Budget ($)</label>
+                    <input type="number" id="target-edit-price" min="1" max="50000" placeholder="380" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>eBay Search Query</label>
+                <input type="text" id="target-edit-query" placeholder="e.g. playstation 5 slim console" />
+            </div>
+            <div class="form-group">
+                <label>Required Keywords (comma separated)</label>
+                <input type="text" id="target-edit-required" placeholder="e.g. ps5, playstation, slim" />
+            </div>
+            <div class="form-group">
+                <label>Exclusion Keywords (comma separated)</label>
+                <input type="text" id="target-edit-excluded" placeholder="e.g. box only, broken, parts" />
+            </div>
+            <div class="modal-btns">
+                <button class="btn btn-ghost" onclick="closeEditTargetModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveTargetForm()">Save Target</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // ── State ─────────────────────────────────────────────────
+        // State
         let ws = null;
         let allListings = [];
         let alertHistory = [];
+        let allTargets = [];
         let isScanning = false;
         let nextScanTime = null;
         let nextScanStart = null;
         let scanIntervalMs = 10 * 60 * 1000;
         let sortNewest = true;
-        let filterMode = 'all'; // 'all' | 'new' | 'best'
+        let filterMode = 'all'; // Filter mode
         let filterText = '';
         let progressTimer = null;
 
-        // ── WebSocket ─────────────────────────────────────────────
+        // WebSocket
         function connectWS() {
             const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
             ws = new WebSocket(`${protocol}://${location.host}`);
@@ -1270,6 +1443,9 @@
                 case 'scan_start':
                     setScanning(true, data.scanCount);
                     break;
+                case 'target_progress':
+                    updateTargetProgress(data);
+                    break;
                 case 'scan_complete':
                     setScanning(false);
                     document.getElementById('stat-scans').textContent = data.scanCount;
@@ -1282,8 +1458,8 @@
                     break;
                 case 'scan_error':
                     setScanning(false);
-                    addLog('error', '❌ ' + data.error);
-                    showToast('error', '❌ Scan Error', data.error.substring(0, 60));
+                    addLog('error', '[ERROR] ' + data.error);
+                    showToast('error', 'Scan Error', data.error.substring(0, 60));
                     break;
                 case 'listings':
                     allListings = data.listings || [];
@@ -1296,8 +1472,13 @@
                     renderAlerts();
                     if (alertHistory.length > 0) {
                         const top = alertHistory[0];
-                        showToast('deal', '🚨 New Deal!', `${top.title.substring(0, 45)}… — $${top.totalPrice.toFixed(2)}`);
+                        showToast('deal', 'New Deal!', `${top.title.substring(0, 45)}… — $${top.totalPrice.toFixed(2)}`);
                     }
+                    break;
+                case 'targets_updated':
+                    allTargets = data.targets || [];
+                    renderTargets();
+                    updateTargetsStat();
                     break;
                 case 'log':
                     addLog(data.level, data.message, data.time);
@@ -1312,20 +1493,23 @@
                     renderAlerts();
                     document.getElementById('stat-listings').textContent = '0';
                     document.getElementById('stat-alerts').textContent = '0';
-                    showToast('info', '🗑️ Reset', 'History cleared. Watching for new deals...');
+                    showToast('info', 'Reset', 'History cleared. Watching for new deals...');
                     break;
             }
         }
 
         function applyInit(data) {
-            // Config
             if (data.config) {
                 updateUIConfig(data.config);
                 const discordOk = data.config.webhookConfigured;
-                document.getElementById('discord-status-text').textContent = discordOk ? '✅ Connected & Active' : '❌ Webhook not configured';
+                document.getElementById('discord-status-text').textContent = discordOk ? 'Connected & Active' : 'Webhook not configured';
                 document.getElementById('discord-status-text').className = discordOk ? 'discord-ok' : 'discord-miss';
             }
-            // Status
+            if (data.targets) {
+                allTargets = data.targets;
+                renderTargets();
+                updateTargetsStat();
+            }
             if (data.status) {
                 document.getElementById('stat-scans').textContent = data.status.scanCount || 0;
                 document.getElementById('total-tracked').textContent = data.status.totalTracked || 0;
@@ -1340,7 +1524,6 @@
                 }
                 setScanning(data.status.isScanning);
             }
-            // Data
             if (data.listings) {
                 allListings = data.listings;
                 document.getElementById('stat-listings').textContent = allListings.length;
@@ -1359,7 +1542,149 @@
             }
         }
 
-        // ── Scan State ────────────────────────────────────────────
+        function updateTargetsStat() {
+            const active = allTargets.filter(t => t.enabled !== false).length;
+            document.getElementById('stat-targets').textContent = `${active}/${allTargets.length}`;
+            document.getElementById('target-count-badge').textContent = `${active}/${allTargets.length} active`;
+        }
+
+        function updateTargetProgress(prog) {
+            const statusEl = document.getElementById('scan-status-text');
+            if (prog.status === 'starting') {
+                statusEl.innerHTML = `<span class="scanning-text">[${prog.index}/${prog.total}] Scanning ${escHtml(prog.target.name)}...</span>`;
+            } else if (prog.status === 'completed') {
+                showToast('info', `Target Filtered`, `Target "${prog.target.name}" matched ${prog.matchCount} deal(s)`);
+            }
+        }
+
+        // Target manager modal
+        function openTargetsModal() {
+            renderTargets();
+            document.getElementById('targets-modal').classList.add('open');
+        }
+
+        function closeTargetsModal() {
+            document.getElementById('targets-modal').classList.remove('open');
+        }
+
+        function renderTargets() {
+            const grid = document.getElementById('target-grid');
+            if (!grid) return;
+
+            if (allTargets.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:30px; color:var(--muted)">No targets configured yet. Click "+ Add Custom Target" above.</div>';
+                return;
+            }
+
+            grid.innerHTML = allTargets.map(t => {
+                const isEnabled = t.enabled !== false;
+                return `
+                <div class="target-card ${isEnabled ? '' : 'disabled'}">
+                    <div>
+                        <div class="target-card-header">
+                            <div>
+                                <span class="badge badge-target">${escHtml(t.category || 'General')}</span>
+                                <div class="target-card-title" style="margin-top:4px;">${escHtml(t.name)}</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" ${isEnabled ? 'checked' : ''} onchange="toggleTarget('${t.id}')">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="target-meta">
+                            <div><strong>Max:</strong> $${t.maxPrice}</div>
+                            <div style="font-family:'JetBrains Mono', monospace; font-size:0.7rem; color:var(--accent); margin-top:2px;">"${escHtml(t.query)}"</div>
+                        </div>
+                    </div>
+                    <div class="target-actions">
+                        <button class="btn btn-ghost" onclick="editTarget('${t.id}')" style="padding:4px 8px; font-size:0.72rem; flex:1;">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteTarget('${t.id}')" style="padding:4px 8px; font-size:0.72rem;">Delete</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function toggleTarget(id) {
+            const res = await fetch('/api/targets/toggle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                allTargets = data.targets;
+                renderTargets();
+                updateTargetsStat();
+            }
+        }
+
+        async function deleteTarget(id) {
+            if (!confirm('Are you sure you want to delete this target?')) return;
+            const res = await fetch(`/api/targets/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                const data = await res.json();
+                allTargets = data.targets;
+                renderTargets();
+                updateTargetsStat();
+                showToast('info', 'Target Deleted', 'Target removed successfully.');
+            }
+        }
+
+        function openEditTargetModal(targetObj = null) {
+            document.getElementById('target-edit-id').value = targetObj ? targetObj.id : '';
+            document.getElementById('target-edit-name').value = targetObj ? targetObj.name : '';
+            document.getElementById('target-edit-category').value = targetObj ? targetObj.category : '';
+            document.getElementById('target-edit-price').value = targetObj ? targetObj.maxPrice : '';
+            document.getElementById('target-edit-query').value = targetObj ? targetObj.query : '';
+            document.getElementById('target-edit-required').value = targetObj ? targetObj.requiredKeywords : '';
+            document.getElementById('target-edit-excluded').value = targetObj ? targetObj.exclusionKeywords : '';
+            document.getElementById('edit-target-modal-title').textContent = targetObj ? 'Edit Target' : 'Add High-Value Target';
+            document.getElementById('edit-target-modal').classList.add('open');
+        }
+
+        function closeEditTargetModal() {
+            document.getElementById('edit-target-modal').classList.remove('open');
+        }
+
+        function editTarget(id) {
+            const t = allTargets.find(item => item.id === id);
+            if (t) openEditTargetModal(t);
+        }
+
+        async function saveTargetForm() {
+            const id = document.getElementById('target-edit-id').value;
+            const name = document.getElementById('target-edit-name').value;
+            const category = document.getElementById('target-edit-category').value;
+            const maxPrice = parseFloat(document.getElementById('target-edit-price').value);
+            const query = document.getElementById('target-edit-query').value;
+            const requiredKeywords = document.getElementById('target-edit-required').value;
+            const exclusionKeywords = document.getElementById('target-edit-excluded').value;
+
+            if (!name || !query || !maxPrice) {
+                alert('Target Name, Search Query, and Max Budget are required.');
+                return;
+            }
+
+            const payload = { id, name, category, query, maxPrice, requiredKeywords, exclusionKeywords, enabled: true };
+            const res = await fetch('/api/targets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                allTargets = data.targets;
+                renderTargets();
+                updateTargetsStat();
+                closeEditTargetModal();
+                showToast('info', 'Target Saved', `"${name}" configured successfully!`);
+            } else {
+                showToast('error', 'Error', 'Failed to save target.');
+            }
+        }
+
+        // Scan state
         function setScanning(scanning, scanNum) {
             isScanning = scanning;
             const btn = document.getElementById('btn-scan');
@@ -1367,16 +1692,16 @@
             if (scanning) {
                 btn.disabled = true;
                 btn.innerHTML = '<div class="spin"></div> Scanning...';
-                statusEl.innerHTML = `<span class="scanning-text">🔍 Scanning #${scanNum || ''}...</span>`;
+                statusEl.innerHTML = `<span class="scanning-text">Scanning #${scanNum || ''}...</span>`;
             } else {
                 btn.disabled = false;
-                btn.innerHTML = '<span>⚡</span> Scan Now';
-                statusEl.textContent = '✅ Idle';
+                btn.innerHTML = 'Scan Now';
+                statusEl.textContent = 'Idle';
                 document.getElementById('last-scan-text').textContent = new Date().toLocaleTimeString();
             }
         }
 
-        // ── Progress Bar ──────────────────────────────────────────
+        // Progress bar
         function startProgressBar() {
             if (progressTimer) clearInterval(progressTimer);
             const bar = document.getElementById('next-scan-bar');
@@ -1390,7 +1715,7 @@
             }, 1000);
         }
 
-        // ── Rendering ─────────────────────────────────────────────
+        // Rendering
         function getPriceClass(price) {
             if (price <= 150) return 'price-steal';
             if (price <= 180) return 'price-great';
@@ -1410,7 +1735,11 @@
         function getVisibleListings() {
             let visible = [...allListings];
             if (filterText) {
-                visible = visible.filter(l => l.title.toLowerCase().includes(filterText.toLowerCase()));
+                visible = visible.filter(l =>
+                    l.title.toLowerCase().includes(filterText.toLowerCase()) ||
+                    (l.targetName && l.targetName.toLowerCase().includes(filterText.toLowerCase())) ||
+                    (l.targetCategory && l.targetCategory.toLowerCase().includes(filterText.toLowerCase()))
+                );
             }
             if (filterMode === 'new') {
                 const oneHourAgo = Date.now() - 60 * 60 * 1000;
@@ -1432,10 +1761,10 @@
             if (visible.length === 0) {
                 container.innerHTML = `
       <div class="empty-state">
-        <div class="empty-icon">${isScanning ? '🔍' : '🎮'}</div>
-        <h3>${isScanning ? 'Scanning eBay...' : 'No matching listings yet'}</h3>
+        <div class="empty-icon">[...]</div>
+        <h3>${isScanning ? 'Scanning eBay Targets...' : 'No matching listings yet'}</h3>
         <p>${isScanning
-                        ? 'Bypassing bot protection and extracting live listings...'
+                        ? 'Bypassing bot protection and extracting live listings across active targets...'
                         : 'Either no deals available right now, or filters are too strict.'}</p>
       </div>`;
                 return;
@@ -1446,20 +1775,25 @@
                 const isAlerted = alertHistory.some(a => a.itemId === listing.itemId);
                 const imgHtml = listing.image
                     ? `<img class="listing-img" src="${listing.image}" alt="" onerror="this.style.display='none'; this.nextSibling.style.display='flex'"/>
-         <div class="listing-img-placeholder" style="display:none">🎮</div>`
-                    : `<div class="listing-img-placeholder">🎮</div>`;
+         <div class="listing-img-placeholder" style="display:none">[Item]</div>`
+                    : `<div class="listing-img-placeholder">[Item]</div>`;
+
+                const targetBadge = listing.targetName
+                    ? `<span class="badge badge-target">${escHtml(listing.targetName)}</span>`
+                    : '';
 
                 return `<a class="listing-card ${isAlerted ? 'new-card' : ''}" href="${listing.url}" target="_blank" rel="noopener">
       ${imgHtml}
       <div class="listing-info">
         <div class="listing-title">${escHtml(listing.title)}</div>
         <div class="listing-meta">
+          ${targetBadge}
           <span class="listing-price ${priceClass}">$${listing.totalPrice.toFixed(2)}</span>
           <span class="badge badge-condition">${escHtml(listing.condition || 'Used')}</span>
           <span class="badge ${listing.shippingCost === 0 ? 'badge-ship-free' : 'badge-ship-paid'}">
-            ${listing.shippingCost === 0 ? '✅ Free Ship' : `+$${listing.shippingCost.toFixed(2)} ship`}
+            ${listing.shippingCost === 0 ? 'Free Ship' : `+$${listing.shippingCost.toFixed(2)} ship`}
           </span>
-          ${isAlerted ? '<span class="badge badge-new">🔔 Alerted</span>' : ''}
+          ${isAlerted ? '<span class="badge badge-new">Alerted</span>' : ''}
         </div>
         <div class="listing-time">Found ${timeAgo(listing.foundAt)} · #${listing.itemId}</div>
       </div>
@@ -1475,16 +1809,16 @@
             }
             container.innerHTML = alertHistory.map(alert => `
     <a class="alert-item" href="${alert.url}" target="_blank" rel="noopener">
-      <div class="alert-item-icon">🚨</div>
+      <div class="alert-item-icon">!</div>
       <div class="alert-item-info">
-        <div class="alert-item-title">${escHtml(alert.title)}</div>
+        <div class="alert-item-title">${alert.targetName ? `[${escHtml(alert.targetName)}] ` : ''}${escHtml(alert.title)}</div>
         <div class="alert-item-price">$${alert.totalPrice.toFixed(2)}</div>
         <div class="alert-item-time">${timeAgo(alert.alertedAt)}</div>
       </div>
     </a>`).join('');
         }
 
-        // ── Log ───────────────────────────────────────────────────
+        // Log
         function addLog(level, message, time, scroll = true) {
             const container = document.getElementById('log-container');
             const timeStr = time || new Date().toLocaleTimeString();
@@ -1500,22 +1834,21 @@
             entry.innerHTML = `<span class="log-time">${timeStr}</span><span class="${cssClass}">${escHtml(message)}</span>`;
             container.insertBefore(entry, container.firstChild);
 
-            // Keep max 80 entries
             while (container.children.length > 80) container.removeChild(container.lastChild);
         }
 
-        // ── Toast ─────────────────────────────────────────────────
+        // Toast
         function showToast(type, title, msg) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            const icon = type === 'deal' ? '🚨' : type === 'error' ? '❌' : 'ℹ️';
+            const icon = type === 'deal' ? '[DEAL]' : type === 'error' ? '[!]' : '[i]';
             toast.className = `toast toast-${type}`;
             toast.innerHTML = `<span class="toast-icon">${icon}</span><div><strong>${escHtml(title)}</strong><br><span style="color:var(--muted);font-size:0.78rem">${escHtml(msg)}</span></div>`;
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 6000);
         }
 
-        // ── Actions ───────────────────────────────────────────────
+        // Actions
         async function triggerScan() {
             await fetch('/api/scan', { method: 'POST' });
         }
@@ -1544,10 +1877,10 @@
                 body: JSON.stringify(config)
             });
             if (res.ok) {
-                showToast('info', '⚙️ Config Updated', 'Settings saved successfully');
+                showToast('info', 'Config Updated', 'Settings saved successfully');
                 closeSettingsModal();
             } else {
-                showToast('error', '❌ Update Failed', 'Failed to save settings');
+                showToast('error', 'Update Failed', 'Failed to save settings');
             }
         }
 
@@ -1558,20 +1891,27 @@
             document.getElementById('modal-interval').value = data.intervalMinutes || '';
             document.getElementById('modal-required').value = data.requiredKeywords || '';
             document.getElementById('modal-excluded').value = data.exclusionKeywords || '';
-            
-            // For security, populate webhook only if received from server (usually want to obscure this, but for local admin it's fine)
+
             if (data.webhookUrl !== undefined) {
                 document.getElementById('modal-webhook').value = data.webhookUrl;
             }
 
-            document.getElementById('stat-price').textContent = `$${data.maxPrice}`;
             scanIntervalMs = (data.intervalMinutes || 10) * 60 * 1000;
-            
+
             if (data.projectName) {
                 document.getElementById('ui-project-name').textContent = data.projectName;
             }
             if (data.query) {
                 document.getElementById('ui-query').textContent = data.query;
+            }
+
+            const notice = document.getElementById('config-notice');
+            if (notice) {
+                if (!data.webhookUrl) {
+                    notice.style.display = 'flex';
+                } else {
+                    notice.style.display = 'none';
+                }
             }
         }
 
@@ -1614,14 +1954,14 @@
             document.getElementById('btn-filter-all').className = 'sort-btn' + (active === 'all' ? ' active' : '');
         }
 
-        // ── Utils ─────────────────────────────────────────────────
+        // Utils
         function escHtml(str) {
             const d = document.createElement('div');
             d.appendChild(document.createTextNode(str || ''));
             return d.innerHTML;
         }
 
-        // ── Boot ──────────────────────────────────────────────────
+        // Boot
         connectWS();
     </script>
 </body>
